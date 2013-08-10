@@ -12,7 +12,8 @@
                  [markdown-clj "0.9.28"]
                  [org.jclouds/jclouds-allblobstore "1.6.0"]
                  [org.hornetq/hornetq-core-client "2.3.3.Final"]
-                 [org.activiti/activiti-engine "5.13"]]
+                 [org.activiti/activiti-engine "5.13"]
+                 [org.clojure/tools.nrepl "0.2.3"]]
   :plugins [[lein-ring "0.8.5"]]
   :repositories [["Alfresco Maven Repository" "https://maven.alfresco.com/nexus/content/groups/public/"]]
   :ring {:handler zambuko-back.handler/war-handler
