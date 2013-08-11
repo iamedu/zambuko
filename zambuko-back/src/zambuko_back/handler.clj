@@ -10,7 +10,7 @@
             [com.postspectacular.rotor :as rotor]))
 
 (defroutes app-routes
-  (wrap-gzip (zroute/resources config/mongo-db config/bstore))
+  (zroute/resources config/mongo-db config/bstore)
   (route/not-found "Not Found"))
 
 (defn init
@@ -46,7 +46,7 @@
            ;;add your application routes here
            [home-routes app-routes]
            ;;add custom middleware here           
-           :middleware []
+           :middleware [wrap-gzip]
            ;;add access rules here
            ;;each rule should be a vector
            :access-rules []))

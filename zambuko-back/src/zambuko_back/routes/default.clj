@@ -4,6 +4,7 @@
             [ring.middleware.content-type :as c]
             [ring.middleware.head :as h]
             [ring.util.response :as r]
+            [ring.middleware.gzip :as gz]
             [org.jclouds.blobstore2 :as bs]
             [noir.util.cache :as cache]
             [zambuko-back.data.sites :as sites]))
@@ -23,6 +24,7 @@
                              (constantly)
                              (c/wrap-content-type)
                              (f/wrap-file-info)
-                             (h/wrap-head))]
+                             (h/wrap-head)
+                             (gz/wrap-gzip))]
           (request-fn request))))))
 
