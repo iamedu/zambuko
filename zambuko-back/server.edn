@@ -1,5 +1,5 @@
 {:instance-id "single-zambuko"
- :blobstore {:type "filesystem"
+ :blobstore {:backend "filesystem"
              :username "foo"
              :password "bar"}
  :mongo {:host "localhost"

@@ -1,6 +1,7 @@
 (ns zambuko-back.handler  
-  (:require [compojure.core :refer [defroutes]]            
+  (:require [zambuko-back.config :as config]
             [zambuko-back.routes.home :refer [home-routes]]
+            [compojure.core :refer [defroutes]]            
             [noir.util.middleware :as middleware]
             [compojure.route :as route]
             [taoensso.timbre :as timbre]
@@ -16,6 +17,8 @@
    an app server such as Tomcat
    put any initialization code here"
   []
+  (config/init!)
+
   (timbre/set-config!
     [:appenders :rotor]
     {:min-level :info
