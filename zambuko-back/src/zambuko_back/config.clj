@@ -1,5 +1,6 @@
 (ns zambuko-back.config
-  (:require [clojure.edn :as edn]
+  (:require [zambuko-back.data.indexes :as indexes]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [org.jclouds.blobstore2 :as bs]
             [monger.core :as mc]
@@ -20,15 +21,20 @@
       (System/setProperty k v))))
 
 (defn start-blobstore! []
-  (let [{:keys [backend username password]} (:blobstore @zambuko-config)]
-    (reset! bstore (bs/blobstore backend username password))))
+  (let [{:keys [backend username password]} (:blobstore @zambuko-config)
+        containers ["sites" "tmp" "files"]
+        local-bstore (bs/blobstore backend username password)]
+    (doseq [container containers]
+      (bs/create-container local-bstore container))
+    (reset! bstore local-bstore)))
 
 (defn start-mongo! []
   (let [{:keys [username password db] :as zc} (:mongo @zambuko-config)]
     (mc/connect! zc)
     (mc/use-db! db)
     (reset! mongo-db (mc/get-db db))
-    (mc/authenticate (mc/get-db db) username (.toCharArray password))))
+    (mc/authenticate (mc/get-db db) username (.toCharArray password))
+    (indexes/create-indexes)))
 
 (defn start-embedded-hornetq! [zc]
   (let [server (server/server {:in-vm true})]
