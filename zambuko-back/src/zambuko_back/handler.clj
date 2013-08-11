@@ -37,7 +37,8 @@
   "destroy will be called when your application
    shuts down, put any clean up code here"
   []
-  (timbre/info "zambuko-back is shutting down..."))
+  (timbre/info "zambuko-back is shutting down...")
+  (config/stop!))
 
 (def app (middleware/app-handler
            ;;add your application routes here

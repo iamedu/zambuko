@@ -23,8 +23,8 @@
     (reset! bstore (bs/blobstore backend username password))))
 
 (defn start-mongo! []
-  (let [{:keys [host port username password db]} (:mongo @zambuko-config)]
-    (mc/connect! {:host host :port port})
+  (let [{:keys [username password db] :as zc} (:mongo @zambuko-config)]
+    (mc/connect! zc)
     (mc/use-db! db)
     (mc/authenticate (mc/get-db db) username (.toCharArray password))))
 
@@ -46,6 +46,14 @@
     (when start 
       (reset! nrepl-server (nrepl/start-server :port port)))))
 
+(defn stop-hornetq! []
+  (when @hornet-server
+    (.stop hornet-server)))
+
+(defn stop-nrepl! []
+  (when @nrepl-server 
+    (nrepl/stop-server @nrepl-server)))
+
 (defn load-config []
   (with-open [stream (java.io.PushbackReader. (io/reader "server.edn"))]
     (edn/read stream)))
@@ -61,3 +69,6 @@
   (start-hornetq!)
   (start-nrepl!))
 
+(defn stop! []
+  (stop-nrepl!)
+  (stop-hornetq!))
