@@ -8,4 +8,5 @@
          :password "bar"
          :db "default"}
  :system-properties {
-   "jclouds.filesystem.basedir" "/tmp/foo"}}
+   "jclouds.filesystem.basedir" "/tmp/foo"}
+ :hornetq {:embedded true}}
