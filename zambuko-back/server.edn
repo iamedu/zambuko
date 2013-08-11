@@ -3,7 +3,7 @@
              :username "foo"
              :password "bar"}
  :mongo {:host "localhost"
-         :post 7878
+         :port 27017
          :username "foo"
          :password "bar"
          :db "default"}

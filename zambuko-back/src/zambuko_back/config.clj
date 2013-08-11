@@ -1,7 +1,8 @@
 (ns zambuko-back.config
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
-            [org.jclouds.blobstore2 :as bs]))
+            [org.jclouds.blobstore2 :as bs]
+            [monger.core :as mc]))
 
 (def zambuko-config (atom nil))
 (def bstore (atom nil))
@@ -15,9 +16,14 @@
   (let [{:keys [backend username password]} (:blobstore @zambuko-config)]
     (reset! bstore (bs/blobstore backend username password))))
 
-(defn start-mongo! [])
+(defn start-mongo! []
+  (let [{:keys [host port username password db]} (:mongo @zambuko-config)]
+    (mc/connect! {:host host :port port})
+    (mc/use-db! db)
+    (mc/authenticate (mc/get-db db) username (.toCharArray password))))
 
-(defn start-hornetq! [])
+(defn start-hornetq! []
+  (let [{:keys [embedded]} (:hornetq @zambuko-config)]))
 
 (defn load-config []
   (with-open [stream (java.io.PushbackReader. (io/reader "server.edn"))]
@@ -27,10 +33,9 @@
   (reset! zambuko-config (config)))
 
 (defn init! []
-  (do
-    (reset! zambuko-config (load-config))
-    (setup-system!)
-    (start-blobstore!)
-    (start-mongo!)
-    (start-hornetq!)))
+  (reset! zambuko-config (load-config))
+  (setup-system!)
+  (start-blobstore!)
+  (start-mongo!)
+  (start-hornetq!))
 
