@@ -6,4 +6,6 @@
          :post 7878
          :username "foo"
          :password "bar"
-         :db "default"}}
+         :db "default"}
+ :system-properties {
+   "jclouds.filesystem.basedir" "/tmp/foo"}}
