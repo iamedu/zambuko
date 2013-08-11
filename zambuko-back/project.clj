@@ -11,6 +11,7 @@
                  [com.postspectacular/rotor "0.1.0"]
                  [com.taoensso/tower "1.7.1"]
                  [markdown-clj "0.9.28"]
+                 [org.clojars.mikejs/ring-gzip-middleware "0.1.0-SNAPSHOT"]
                  [com.novemberain/monger "1.5.0"]
                  [org.jclouds/jclouds-allblobstore "1.6.0"]
                  [hornetq-clj/client "0.2.1"]

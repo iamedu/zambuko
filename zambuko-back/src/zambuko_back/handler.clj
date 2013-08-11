@@ -1,6 +1,8 @@
 (ns zambuko-back.handler  
   (:require [zambuko-back.config :as config]
-            [zambuko-back.routes.home :refer [home-routes]]
+            [zambuko-back.routes.home  :refer [home-routes]]
+            [ring.middleware.gzip :refer [wrap-gzip]]
+            [zambuko-back.routes.default :as zroute]
             [compojure.core :refer [defroutes]]            
             [noir.util.middleware :as middleware]
             [compojure.route :as route]
@@ -8,7 +10,7 @@
             [com.postspectacular.rotor :as rotor]))
 
 (defroutes app-routes
-  (route/resources "/")
+  (wrap-gzip (zroute/resources config/mongo-db config/bstore))
   (route/not-found "Not Found"))
 
 (defn init
