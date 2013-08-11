@@ -7,11 +7,12 @@
             [hornetq-clj.server :as server]
             [hornetq-clj.core-client :as client]))
 
-(def zambuko-config (atom nil))
-(def bstore (atom nil))
-(def nrepl-server (atom nil))
-(def hornet-server (atom nil))
-(def hornet-session-factory (atom nil))
+(defonce zambuko-config (atom nil))
+(defonce bstore (atom nil))
+(defonce nrepl-server (atom nil))
+(defonce hornet-server (atom nil))
+(defonce mongo-db (atom nil))
+(defonce hornet-session-factory (atom nil))
 
 (defn setup-system! []
   (let [props (:system-properties @zambuko-config {})]
@@ -26,6 +27,7 @@
   (let [{:keys [username password db] :as zc} (:mongo @zambuko-config)]
     (mc/connect! zc)
     (mc/use-db! db)
+    (reset! mongo-db (mc/get-db db))
     (mc/authenticate (mc/get-db db) username (.toCharArray password))))
 
 (defn start-embedded-hornetq! [zc]
