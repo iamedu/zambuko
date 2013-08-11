@@ -5,6 +5,7 @@
             [ring.middleware.head :as h]
             [ring.util.response :as r]
             [org.jclouds.blobstore2 :as bs]
+            [noir.util.cache :as cache]
             [zambuko-back.data.sites :as sites]))
 
 (defn resources [db bstore]
@@ -14,14 +15,14 @@
           site (sites/site @db host)
           site-id (:_id site "default")
           full-path (str site-id uri)
-          stream (and (bs/blob-exists? @bstore "sites" full-path)
-                      (bs/get-blob-stream @bstore "sites" full-path))]
-      (if stream
-        (let [stream-fn (-> stream
-                            (r/response)
-                            (constantly)
-                            (c/wrap-content-type)
-                            (f/wrap-file-info)
-                            (h/wrap-head))]
-          (stream-fn request))))))
+          stream-fn #(bs/get-blob-stream @bstore "sites" full-path)
+          stream (cache/cache! (str "sites/" full-path) stream-fn)]
+      (if (bs/blob-exists? @bstore "sites" full-path)
+        (let [request-fn (-> (stream)
+                             (r/response)
+                             (constantly)
+                             (c/wrap-content-type)
+                             (f/wrap-file-info)
+                             (h/wrap-head))]
+          (request-fn request))))))
 
