@@ -9,4 +9,6 @@
          :db "default"}
  :system-properties {
    "jclouds.filesystem.basedir" "/tmp/foo"}
- :hornetq {:embedded true}}
+ :hornetq {:embedded true}
+ :nrepl {:start true
+         :port 59258}}
