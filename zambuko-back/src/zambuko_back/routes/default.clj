@@ -9,9 +9,15 @@
             [noir.util.cache :as cache]
             [zambuko-back.data.sites :as sites]))
 
+(defn- default-index [request]
+  (if (= (get request :uri) "/")
+    (assoc request :uri "/index.html")
+    request))
+
 (defn resources [db bstore]
-  (fn [request]
-    (let [host (get-in request [:headers "host"] "default")
+  (fn [original-request]
+    (let [request (default-index original-request)
+          host (get-in request [:headers "host"] "default")
           uri  (get request :uri)
           site (sites/site @db host)
           site-id (:_id site "default")
