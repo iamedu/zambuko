@@ -5,13 +5,11 @@
             [zambuko-back.routes.default :as zroute]
             [compojure.core :refer [defroutes]]            
             [noir.util.middleware :as middleware]
-            [compojure.route :as route]
             [taoensso.timbre :as timbre]
             [com.postspectacular.rotor :as rotor]))
 
 (defroutes app-routes
-  (zroute/resources config/mongo-db config/bstore)
-  (route/not-found "Not Found"))
+  (zroute/resources config/mongo-db config/bstore))
 
 (defn init
   "init will be called once when
@@ -44,7 +42,7 @@
 
 (def app (middleware/app-handler
            ;;add your application routes here
-           [home-routes app-routes]
+           [app-routes home-routes]
            ;;add custom middleware here           
            :middleware [wrap-gzip]
            ;;add access rules here
