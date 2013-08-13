@@ -22,7 +22,7 @@
 
 (defn start-blobstore! []
   (let [{:keys [backend username password]} (:blobstore @zambuko-config)
-        containers ["sites" "tmp" "files"]
+        containers ["sites" "tmp" "files" "classpath"]
         local-bstore (bs/blobstore backend username password)]
     (doseq [container containers]
       (bs/create-container local-bstore container))

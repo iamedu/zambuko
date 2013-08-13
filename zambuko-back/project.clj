@@ -30,4 +30,5 @@
                        :auto-reload?  false}}
    :dev {:dependencies [[ring-mock "0.1.5"]
                         [ring/ring-devel "1.1.8"]]}}
+  :aot [zambuko-back.classloader]
   :min-lein-version "2.0.0")
