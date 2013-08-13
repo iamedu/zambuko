@@ -6,8 +6,7 @@
             [ring.util.response :as r]
             [ring.middleware.gzip :as gz]
             [org.jclouds.blobstore2 :as bs]
-            [noir.util.cache :as cache]
-            [zambuko-back.data.sites :as sites]))
+            [noir.util.cache :as cache]))
 
 (defn- default-index [request]
   (if (= (get request :uri) "/")
@@ -19,8 +18,7 @@
     (let [request (default-index original-request)
           host (get-in request [:headers "host"] "default")
           uri  (get request :uri)
-          site (sites/site @db host)
-          site-id (:_id site "default")
+          site-id (if (bs/directory-exists? @bstore "sites" host) host "default")
           full-path (str site-id uri)
           stream-fn #(bs/get-blob-stream @bstore "sites" full-path)
           stream (cache/cache! (str "sites/" full-path) stream-fn)]

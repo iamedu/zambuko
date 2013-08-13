@@ -1,6 +1,5 @@
 (ns zambuko-back.config
-  (:require [zambuko-back.data.indexes :as indexes]
-            [clojure.edn :as edn]
+  (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [org.jclouds.blobstore2 :as bs]
             [monger.core :as mc]
@@ -33,8 +32,7 @@
     (mc/connect! zc)
     (mc/use-db! db)
     (reset! mongo-db (mc/get-db db))
-    (mc/authenticate (mc/get-db db) username (.toCharArray password))
-    (indexes/create-indexes)))
+    (mc/authenticate (mc/get-db db) username (.toCharArray password))))
 
 (defn start-embedded-hornetq! [zc]
   (let [server (server/server {:in-vm true})]
