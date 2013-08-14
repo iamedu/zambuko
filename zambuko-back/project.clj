@@ -2,6 +2,7 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :dependencies [[org.clojure/clojure "1.5.1"]
+                 [classlojure "0.6.6"]
                  [clj-time "0.5.1"]
                  [lib-noir "0.6.6"]
                  [compojure "1.1.5"]
@@ -30,5 +31,7 @@
                        :auto-reload?  false}}
    :dev {:dependencies [[ring-mock "0.1.5"]
                         [ring/ring-devel "1.1.8"]]}}
-  :aot [zambuko-back.classloader]
+  :aot [zambuko-back.classloader
+        sun.net.www.protocol.zambuko.handler 
+        sun.net.www.protocol.zambuko.connection]
   :min-lein-version "2.0.0")

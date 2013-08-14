@@ -18,3 +18,6 @@
         (.exposeDefineClass this (.toByteArray output-stream) 0 (.size output-stream)))
       (throw (ClassNotFoundException. name)))))
 
+(defn -findResource [this name]
+  (java.net.URL. (str "zambuko:" name)))
+
