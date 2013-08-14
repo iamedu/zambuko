@@ -1,11 +1,14 @@
 (ns zambuko-back.config
-  (:require [clojure.edn :as edn]
+  (:require [zambuko-back.consumer :as consumer]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [org.jclouds.blobstore2 :as bs]
             [monger.core :as mc]
             [clojure.tools.nrepl.server :as nrepl]
             [hornetq-clj.server :as server]
-            [hornetq-clj.core-client :as client]))
+            [hornetq-clj.core-client :as client]
+            [taoensso.timbre :as timbre]
+            [classlojure.core :as cls]))
 
 (defonce zambuko-config (atom nil))
 (defonce bstore (atom nil))
@@ -13,6 +16,9 @@
 (defonce hornet-server (atom nil))
 (defonce mongo-db (atom nil))
 (defonce hornet-session-factory (atom nil))
+
+(defn hornet-session []
+  (.createSession @hornet-session-factory))
 
 (defn setup-system! []
   (let [props (:system-properties @zambuko-config {})]
@@ -42,15 +48,33 @@
 
 (defn start-hornetq! []
   (let [{:keys [embedded] :as zc} (:hornetq @zambuko-config)]
-    (reset! hornet-session-factory
-            (if embedded
-              (start-embedded-hornetq! zc)
-              (client/netty-session-factory zc)))))
+    (do
+      (reset! hornet-session-factory
+              (if embedded
+                (start-embedded-hornetq! zc)
+                (client/netty-session-factory zc)))
+      (let [session (hornet-session)]
+        (try  
+          (client/ensure-queue session "request-queue" {})
+          (client/ensure-queue session "response-queue" {})
+        (finally (.close session)))))))
 
 (defn start-nrepl! []
   (let [{:keys [start port]} (:nrepl @zambuko-config)]
     (when start 
       (reset! nrepl-server (nrepl/start-server :port port)))))
+
+(defn reload-consumers! []
+  (try 
+    (let [cl (zambuko.classloader.JCloudsClassLoader. cls/base-classloader)
+          dcl  (clojure.lang.DynamicClassLoader. cl)]
+      (with-bindings  {clojure.lang.Compiler/LOADER dcl}
+        (cls/with-classloader cl
+          (do
+            (require '[zambuko.start :as start] :reload-all)
+            (let [app (eval (read-string "start/app"))]
+              (consumer/submit-handlers! app))))))
+    (catch Exception e (timbre/error (.getMessage e))))) 
 
 (defn stop-hornetq! []
   (when @hornet-server
@@ -59,6 +83,7 @@
 (defn stop-nrepl! []
   (when @nrepl-server 
     (nrepl/stop-server @nrepl-server)))
+
 
 (defn load-config []
   (with-open [stream (java.io.PushbackReader. (io/reader "server.edn"))]
@@ -73,8 +98,11 @@
   (start-blobstore!)
   (start-mongo!)
   (start-hornetq!)
-  (start-nrepl!))
+  (start-nrepl!)
+  (consumer/start! mongo-db bstore hornet-session-factory)
+  (reload-consumers!))
 
 (defn stop! []
+  (consumer/stop!)
   (stop-nrepl!)
   (stop-hornetq!))

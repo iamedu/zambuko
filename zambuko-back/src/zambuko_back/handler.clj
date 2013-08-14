@@ -1,6 +1,6 @@
 (ns zambuko-back.handler  
   (:require [zambuko-back.config :as config]
-            [zambuko-back.routes.home  :refer [home-routes]]
+            [zambuko-back.routes.queue :as qroute]
             [ring.middleware.gzip :refer [wrap-gzip]]
             [zambuko-back.routes.default :as zroute]
             [compojure.core :refer [defroutes]]            
@@ -9,7 +9,8 @@
             [com.postspectacular.rotor :as rotor]))
 
 (defroutes app-routes
-  (zroute/resources config/mongo-db config/bstore))
+  (zroute/resources config/mongo-db config/bstore)
+  (qroute/publish-request))
 
 (defn init
   "init will be called once when
@@ -42,7 +43,7 @@
 
 (def app (middleware/app-handler
            ;;add your application routes here
-           [app-routes home-routes]
+           [app-routes]
            ;;add custom middleware here           
            :middleware [wrap-gzip]
            ;;add access rules here
