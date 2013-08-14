@@ -6,7 +6,7 @@
   (:import [org.hornetq.api.core Message]))
 
 (defn handle-response [consumer]
-  (when-let [message (hq/receive-message consumer 5000)]
+  (when-let [message (hq/receive-message consumer 60000)]
     (if (.getBooleanProperty message "served")
       (let [response (edn/read-string (.getStringProperty message "edn-message"))
             body (java.io.ByteArrayInputStream. (.getBytesProperty message "body"))]
