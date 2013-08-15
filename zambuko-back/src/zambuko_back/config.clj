@@ -14,7 +14,6 @@
 (defonce bstore (atom nil))
 (defonce nrepl-server (atom nil))
 (defonce hornet-server (atom nil))
-(defonce mongo-db (atom nil))
 (defonce hornet-session-factory (atom nil))
 
 (defn hornet-session []
@@ -33,13 +32,6 @@
       (bs/create-container local-bstore container))
     (reset! bstore local-bstore)))
 
-(defn start-mongo! []
-  (let [{:keys [username password db] :as zc} (:mongo @zambuko-config)]
-    (mc/connect! zc)
-    (mc/use-db! db)
-    (reset! mongo-db (mc/get-db db))
-    (mc/authenticate (mc/get-db db) username (.toCharArray password))))
-
 (defn start-embedded-hornetq! [zc]
   (let [server (server/server {:in-vm true})]
     (reset! hornet-server server)
@@ -57,6 +49,7 @@
         (try  
           (client/ensure-queue session "request-queue" {})
           (client/ensure-queue session "response-queue" {})
+          (client/ensure-queue session "error-response-queue" {:durable true})
         (finally (.close session)))))))
 
 (defn start-nrepl! []
@@ -96,10 +89,9 @@
   (reset! zambuko-config (load-config))
   (setup-system!)
   (start-blobstore!)
-  (start-mongo!)
   (start-hornetq!)
   (start-nrepl!)
-  (consumer/start! mongo-db bstore hornet-session-factory)
+  (consumer/start! bstore hornet-session-factory)
   (reload-consumers!))
 
 (defn stop! []

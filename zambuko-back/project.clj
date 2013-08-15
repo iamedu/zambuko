@@ -18,6 +18,7 @@
                  [hornetq-clj/client "0.2.1"]
                  [hornetq-clj/server "0.2.1"]
                  [com.cemerick/friend "0.1.5" :exclusions [com.google.inject/guice]]
+                 [org.apache.pdfbox/pdfbox "1.8.2"]
                  [org.activiti/activiti-engine "5.13"]
                  [org.clojure/tools.nrepl "0.2.3"]]
   :plugins [[lein-ring "0.8.5"]]

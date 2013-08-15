@@ -13,7 +13,7 @@
     (assoc request :uri "/index.html")
     request))
 
-(defn resources [db bstore]
+(defn resources [bstore]
   (fn [original-request]
     (let [request (default-index original-request)
           host (get-in request [:headers "host"] "default")

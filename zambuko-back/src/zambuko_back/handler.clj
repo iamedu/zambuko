@@ -9,7 +9,7 @@
             [com.postspectacular.rotor :as rotor]))
 
 (defroutes app-routes
-  (zroute/resources config/mongo-db config/bstore)
+  (zroute/resources config/bstore)
   (qroute/publish-request))
 
 (defn init
